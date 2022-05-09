@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Ionic lib -->
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
+    <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core/css/ionic.bundle.css" />
+
+    <script type="module">
+        import { toastController } from 'https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/index.esm.js';
+        window.toastController = toastController;
+
+        import { menuController } from 'https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/index.esm.js';
+        window.menuController = menuController;
+
+        import { alertController } from 'https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/index.esm.js';
+        window.alertController = alertController;
+
+    </script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+        integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+        crossorigin="" />
+    <!-- Make sure you put this AFTER Leaflet's CSS -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+        integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+        crossorigin=""></script>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="js/app.js"></script>
+    <script src="capacitor.js"></script>
+    <title>Obligatorio</title>
+</head>
+
+<body>
+    <ion-app>
+        <ion-router>
+            <ion-route url="/" component="pagina-login"></ion-route>
+            <ion-route url="/registro" component="pagina-registro"></ion-route>
+            <ion-route url="/calculadora" component="pagina-calculadora-distancia"></ion-route>
+            <ion-route url="/agregarEnvio" component="pagina-agregar-envio"></ion-route>
+            <ion-route url="/listadoEnvios" component="pagina-listado-envios"></ion-route>
+            <ion-route url="/detalleEnvio" component="pagina-detalle-envio"></ion-route>
+            <ion-route url="/gastoTotal" component="pagina-gasto-total"></ion-route>
+            <ion-route url="/topDepartamentos" component="pagina-top-departamentos"></ion-route>
+            <ion-route url="/ciudadMasCercana" component="pagina-ciudad-mas-cercana"></ion-route>
+        </ion-router>
+
+        <ion-nav root="pagina-login"></ion-nav>
+        <ion-menu side="start" content-id="main">
+            <ion-header>
+                <ion-toolbar color="dark">
+                    <ion-title>Men&uacute;</ion-title>
+                </ion-toolbar>
+            </ion-header>
+            <ion-content class="ion-padding">
+                <ion-list>
+                    <ion-item class="item-menu" href="/calculadora">
+                        <ion-icon name="calculator-outline"></ion-icon>
+                        <ion-label>&nbsp;Calculadora de distancia</ion-label>
+                    </ion-item>
+                    <ion-item class="item-menu" href="/agregarEnvio">
+                        <ion-icon name="bag-add-outline"></ion-icon>
+                        <ion-label>Agregar envío</ion-label>
+                    </ion-item>
+                    <ion-item class="item-menu" href="/listadoEnvios">
+                        <ion-icon name="list-outline"></ion-icon>
+                        <ion-label>Listado de envíos</ion-label>
+                    </ion-item>
+                    <ion-item class="item-menu" href="/gastoTotal">
+                        <ion-icon name="cash-outline"></ion-icon>
+                        <ion-label>Gasto total de envíos</ion-label>
+                    </ion-item>
+                    <ion-item class="item-menu" href="/topDepartamentos">
+                        <ion-icon name="trophy-outline"></ion-icon>
+                        <ion-label>Top 5 departamentos con más envios</ion-label>
+                    </ion-item>
+                    <ion-item class="item-menu" href="/ciudadMasCercana">
+                        <ion-icon name="map-outline"></ion-icon>
+                        <ion-label>Ciudad más cercana</ion-label>
+                    </ion-item>
+                </ion-list>
+            </ion-content>
+        </ion-menu>
+        <div id="main"></div>
+        <!-- LOGIN -->
+        <ion-page class="ion-page" id="pagina-login">
+            <ion-header>
+                <ion-toolbar>
+                    <ion-title>Login</ion-title>
+                </ion-toolbar>
+            </ion-header>
+            <ion-content class="ion-padding">
+                <ion-item>
+                    <ion-label position="floating">
+                        Usuario:
+                    </ion-label>
+                    <ion-input type="text" id="inp_usuario"></ion-input>
+                </ion-item>
+                <ion-item>
+                    <ion-label position="floating">
+                        Contraseña:
+                    </ion-label>
+                    <ion-input type="password" id="inp_contrasenia"></ion-input>
+                </ion-item>
+                <ion-item>
+                    <ion-label>Recordar contraseña</ion-label>
+                    <ion-toggle slot="end" id="recordar-pass"></ion-toggle>
+                </ion-item>
+                <ion-grid>
+                    <ion-row>
+                        <ion-col size="12">
+                            <ion-button expand="block" id="btn_login">Login</ion-button>
+                        </ion-col>
+                    </ion-row>
+                    <ion-row>
+                        <ion-col size="12">
+                            ¿No tiene cuenta?
+                            <ion-router-link href="/registro">Registrarse aquí</ion-router-link>
+                        </ion-col>
+                    </ion-row>
+                </ion-grid>
+            </ion-content>
+            <ion-footer>
+                <ion-title class="ion-text-center">Obligatorio</ion-title>
+            </ion-footer>
+        </ion-page>
+
+        <!-- REGISTRO -->
+        <ion-page class="ion-page" id="pagina-registro">
+            <ion-header>
+                <ion-toolbar>
+                    <ion-title class="ion-text-center">Registro</ion-title>
+                </ion-toolbar>
+            </ion-header>
+            <ion-content class="ion-padding">
+                <ion-item>
+                    <ion-label position="floating">Nombre de usuario:</ion-label>
+                    <ion-input type="text" placeholder="Ingrese nombre de usuario" id="inp_nombreUsuario"></ion-input>
+                </ion-item>
+
+                <ion-item>
+                    <ion-label position="floating">Contrase&ntilde;a</ion-label>
+                    <ion-input type="password" placeholder="Ingrese contrase&ntilde;a" id="inp_password2">
+                    </ion-input>
+                </ion-item>
+                <ion-item>
+                    <ion-label position="floating">Repetir Contrase&ntilde;a</ion-label>
+                    <ion-input type="password" placeholder="Ingrese repetici&oacute;n" id="inp_repassword">
+                    </ion-input>
+                </ion-item>
+                <ion-grid>
+                    <ion-row>
+                        <ion-col size="12">
+                            <ion-button color="primary" expand="block" id="btn_registro">Registrarse</ion-button>
+                        </ion-col>
+                    </ion-row>
+                    <ion-row>
+                        <ion-col size="12">
+                            Ya tiene cuenta? <ion-router-link href="/" class="underline">Ingresar aqu&iacute;
+                            </ion-router-link>
+                        </ion-col>
+                    </ion-row>
+                </ion-grid>
+            </ion-content>
+            <ion-footer>
+                <ion-toolbar>
+                    <ion-title class="ion-text-center">Obligatorio</ion-title>
+                </ion-toolbar>
+            </ion-footer>
+        </ion-page>
+
+        <!-- CALCULADORA DE DISTANCIA-->
+        <ion-page class="ion-page" id="pagina-calculadora-distancia">
+            <ion-header>
+                <ion-toolbar>
+                    <ion-buttons slot="start">
+                        <ion-menu-button></ion-menu-button>
+                    </ion-buttons>
+                    <ion-title class="ion-text-center">Calcular distancia</ion-title>
+                </ion-toolbar>
+            </ion-header>
+            <ion-content class="ion-padding">
+                <ion-item>
+                    <ion-label position="floating">
+                        Ciudad de origen:
+                    </ion-label>
+                    <ion-select id="sel_ciudad_origen_cal"">
+                    </ion-select>
+                </ion-item>
+                <ion-item>
+                    <ion-label position=" floating">
+                        Ciudad de destino:
+                        </ion-label>
+                        <ion-select id="sel_ciudad_destino_cal"></ion-select>
+                </ion-item>
+                <ion-grid>
+                    <ion-row>
+                        <ion-col size=" 12">
+                            <ion-button color="primary" expand="block" id="btn_calcular_distancia">Calcular distancia
+                            </ion-button>
+                        </ion-col>
+                    </ion-row>
+
+                </ion-grid>
+                <p id="p_resultado_distancia"></p>
+                <div id="map_cal"></div>
+            </ion-content>
+            <ion-footer>
+                <ion-toolbar>
+                    <ion-grid>
+                        <ion-row>
+                            <ion-col size=" 12" class="ion-text-center">
+                                <ion-button size="small" color="dark" href="/listadoEnvios">
+                                    <ion-icon name="home-outline"></ion-icon>
+                                </ion-button>
+                                <ion-button size="small" color="dark" class="log_out">
+                                    <ion-icon name="log-out-outline"></ion-icon>
+                                </ion-button>
+                            </ion-col>
+                        </ion-row>
+                    </ion-grid>
+                </ion-toolbar>
+            </ion-footer>
+        </ion-page>
+
+        <!-- AGREGAR UN ENVIO -->
+        <ion-page class="ion-page" id="pagina-agregar-envio">
+            <ion-header>
+                <ion-toolbar>
+                    <ion-buttons slot="start">
+                        <ion-menu-button></ion-menu-button>
+                    </ion-buttons>
+                    <ion-title class="ion-text-center">Agregar envío</ion-title>
+                </ion-toolbar>
+            </ion-header>
+            <ion-content class="ion-padding">
+                <ion-item>
+                    <ion-label position="floating">
+                        Ciudad de origen:
+                    </ion-label>
+                    <ion-select id="sel_ciudad_origen" onkeyup="calcular_precio_envio()">
+                    </ion-select>
+                </ion-item>
+                <ion-item>
+                    <ion-label position="floating">
+                        Ciudad de destino:
+                    </ion-label>
+                    <ion-select id="sel_ciudad_destino" onkeyup="calcular_precio_envio()"></ion-select>
+                </ion-item>
+                <ion-item>
+                    <ion-label position="floating">
+                        Categoría:
+                    </ion-label>
+                    <ion-select id="sel_categoria" onkeyup="calcular_precio_envio()"></ion-select>
+                </ion-item>
+                </ion-item>
+                <ion-item>
+                    <ion-label position="floating">Peso del paquete (kg):</ion-label>
+                    <ion-input type="number" id="inp_peso_paquete" onkeyup="calcular_precio_envio()"></ion-input>
+                </ion-item>
+                <p id="precio_final_envio"></p>
+                <ion-grid>
+                    <ion-row>
+                        <ion-col size="12">
+                            <ion-button expand="block" id="btn_agregar_envio">Agregar envío</ion-button>
+                        </ion-col>
+                    </ion-row>
+                </ion-grid>
+            </ion-content>
+            <ion-footer>
+                <ion-toolbar>
+                    <ion-grid>
+                        <ion-row>
+                            <ion-col size="12" class="ion-text-center">
+                                <ion-button size="small" color="dark" disabled href="/listadoEnvios">
+                                    <ion-icon name="home-outline"></ion-icon>
+                                </ion-button>
+                                <ion-button size="small" color="dark" class="log_out">
+                                    <ion-icon name="log-out-outline"></ion-icon>
+                                </ion-button>
+                            </ion-col>
+                        </ion-row>
+                    </ion-grid>
+                </ion-toolbar>
+            </ion-footer>
+        </ion-page>
+
+        <!-- LISTADO DE ENVIOS -->
+        <ion-page class="ion-page" id="pagina-listado-envios">
+            <ion-header>
+                <ion-toolbar>
+                    <ion-buttons slot="start">
+                        <ion-menu-button></ion-menu-button>
+                    </ion-buttons>
+                    <ion-title class="ion-text-center">Envíos</ion-title>
+                </ion-toolbar>
+            </ion-header>
+            <ion-content class="ion-padding">
+                <ion-list id="list_envios">
+                    <ion-list-header>
+                        <ion-label>Mis envíos</ion-label>
+                    </ion-list-header>
+                </ion-list>
+            </ion-content>
+            <ion-footer>
+                <ion-toolbar>
+                    <ion-grid>
+                        <ion-row>
+                            <ion-col size="12" class="ion-text-center">
+                                <ion-button size="small" color="dark" href="/listadoEnvios">
+                                    <ion-icon name="home-outline"></ion-icon>
+                                </ion-button>
+                                <ion-button size="small" color="dark" class="log_out">
+                                    <ion-icon name="log-out-outline"></ion-icon>
+                                </ion-button>
+                            </ion-col>
+                        </ion-row>
+                    </ion-grid>
+                </ion-toolbar>
+            </ion-footer>
+        </ion-page>
+        <!-- DETALLE DE ENVIO -->
+        <ion-page class="ion-page" id="pagina-detalle-envio">
+            <ion-header>
+                <ion-toolbar>
+                    <ion-buttons slot="start">
+                        <ion-menu-button></ion-menu-button>
+                    </ion-buttons>
+                    <ion-title class="ion-text-center">Detalle envío</ion-title>
+                </ion-toolbar>
+            </ion-header>
+            <ion-content class="ion-padding">
+                <div>
+                    <p id="detalle_origen"></p> <br>
+                    <p id="detalle_destino"></p> <br>
+                    <p id="detalle_distancia"></p><br>
+                    <p id="detalle_peso"></p> <br>
+                    <p id="detalle_precio"></p><br>
+                </div>
+                <div id="map"></div>
+            </ion-content>
+            <ion-footer>
+                <ion-toolbar>
+                    <ion-grid>
+                        <ion-row>
+                            <ion-col size="12" class="ion-text-center">
+                                <ion-button size="small" color="dark" href="/listadoEnvios">
+                                    <ion-icon name="home-outline"></ion-icon>
+                                </ion-button>
+                                <ion-button size="small" color="dark" class="log_out">
+                                    <ion-icon name="log-out-outline"></ion-icon>
+                                </ion-button>
+                            </ion-col>
+                        </ion-row>
+                    </ion-grid>
+                </ion-toolbar>
+            </ion-footer>
+        </ion-page>
+
+        <!--GASTO TOTAL DE ENVÍOS-->
+        <ion-page class="ion-page" id="pagina-gasto-total">
+            <ion-header>
+                <ion-toolbar>
+                    <ion-buttons slot="start">
+                        <ion-menu-button></ion-menu-button>
+                    </ion-buttons>
+                    <ion-title class="ion-text-center">Gasto total de envíos</ion-title>
+                </ion-toolbar>
+            </ion-header>
+            <ion-content class="ion-padding">
+                <h4 id="gasto_total_h4"></h4>
+            </ion-content>
+            <ion-footer>
+                <ion-toolbar>
+                    <ion-grid>
+                        <ion-row>
+                            <ion-col size="12" class="ion-text-center">
+                                <ion-button size="small" color="dark" href="/listadoEnvios">
+                                    <ion-icon name="home-outline"></ion-icon>
+                                </ion-button>
+                                <ion-button size="small" color="dark" class="log_out">
+                                    <ion-icon name="log-out-outline"></ion-icon>
+                                </ion-button>
+                            </ion-col>
+                        </ion-row>
+                    </ion-grid>
+                </ion-toolbar>
+            </ion-footer>
+        </ion-page>
+
+        <!--TOP 5 DEPARTAMENTOS CON MÁS ENVIOS-->
+        <ion-page class="ion-page" id="pagina-top-departamentos">
+            <ion-header>
+                <ion-toolbar>
+                    <ion-buttons slot="start">
+                        <ion-menu-button></ion-menu-button>
+                    </ion-buttons>
+                    <ion-title class="ion-text-center" Top 5 departamentos con más envíos</ion-title>
+                </ion-toolbar>
+            </ion-header>
+            <ion-content class="ion-padding">
+                <h4 id="gasto_total_h4"></h4>
+            </ion-content>
+            <ion-footer>
+                <ion-toolbar>
+                    <ion-grid>
+                        <ion-row>
+                            <ion-col size="12" class="ion-text-center">
+                                <ion-button size="small" color="dark" href="/listadoEnvios">
+                                    <ion-icon name="home-outline"></ion-icon>
+                                </ion-button>
+                                <ion-button size="small" color="dark" class="log_out">
+                                    <ion-icon name="log-out-outline"></ion-icon>
+                                </ion-button>
+                            </ion-col>
+                        </ion-row>
+                    </ion-grid>
+                </ion-toolbar>
+            </ion-footer>
+        </ion-page>
+
+        <!-- CIUDAD MAS CERCANA -->
+        <ion-page class="ion-page" id="pagina-ciudad-mas-cercana">
+            <ion-header>
+                <ion-toolbar>
+                    <ion-buttons slot="start">
+                        <ion-menu-button></ion-menu-button>
+                    </ion-buttons>
+                    <ion-title class="ion-text-center"> Ciudad más cercana</ion-title>
+                </ion-toolbar>
+            </ion-header>
+            <ion-content class="ion-padding">
+                <p>holass</p>
+                <h4 id="ciudad-mas_cercana_h4"></h4>
+                <div id="map_ciudad_cercana"></div>
+            </ion-content>
+            <ion-footer>
+                <ion-toolbar>
+                    <ion-grid>
+                        <ion-row>
+                            <ion-col size="12" class="ion-text-center">
+                                <ion-button size="small" color="dark" href="/listadoEnvios">
+                                    <ion-icon name="home-outline"></ion-icon>
+                                </ion-button>
+                                <ion-button size="small" color="dark" class="log_out">
+                                    <ion-icon name="log-out-outline"></ion-icon>
+                                </ion-button>
+                            </ion-col>
+                        </ion-row>
+                    </ion-grid>
+                </ion-toolbar>
+            </ion-footer>
+        </ion-page>
+    </ion-app>
+</body>
+
+</html>
